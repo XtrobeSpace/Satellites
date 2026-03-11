@@ -61,7 +61,7 @@ def parse_and_filter(csv_text):
         obj_type = row.get("OBJECT_TYPE", "").strip()
 
         # Keep only operational/partial payloads (no rocket bodies, no debris)
-        if status not in ("+", "P") or obj_type != "PAYLOAD":
+        if status not in ("+", "P") or obj_type != "PAY":
             skipped += 1
             continue
 
