@@ -1,0 +1,33 @@
+name: Nightly Satellite Data Fetch
+
+on:
+  schedule:
+    - cron: "30 0 * * *"   # 00:30 UTC daily (offset from rockets job)
+  workflow_dispatch:        # Manual trigger from GitHub UI anytime
+
+jobs:
+  fetch-satellites:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run satellite fetch script
+        run: python scripts/fetch_satellites.py
+
+      - name: Commit and push updated data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/active_satellites.json data/active_satellites.json.gz
+          git diff --cached --quiet || git commit -m "chore: nightly satellite data update $(date -u '+%Y-%m-%d')"
+          git push
